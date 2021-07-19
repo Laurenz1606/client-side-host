@@ -24,7 +24,7 @@ const peerServer = ExpressPeerServer(server);
 
 //html prototype and set global
 const html = {
-  head: "Hallo",
+  head: "<title>Loding done</title>",
   body: "Hallo",
 };
 global.html = html
