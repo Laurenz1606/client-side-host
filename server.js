@@ -18,7 +18,7 @@ app.set("views", __dirname + "/views");
 
 //create express and peer server
 
-let serverport = 3000;
+let serverport =  process.env.PORT ;
 
 const server = app.listen(serverport, () =>
   console.log(`Server running on ${serverport}`)
