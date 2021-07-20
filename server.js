@@ -18,6 +18,7 @@ app.set("views", __dirname + "/views");
 
 //create express and peer server
 
+//todo: add .env with fallback to 3000
 let serverport = 3000;
 
 const server = app.listen(serverport, () =>
