@@ -1,42 +1,47 @@
 <!DOCTYPE html>
 <html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Site-Loader</title>
-    <script
-      defer
-      src="https://unpkg.com/bcryptjs@2.4.3/dist/bcrypt.js"
-    ></script>
-    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
-  </head>
 
-  <body>
-    <style>
-      *,
-      *::before,
-      *::after {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-    </style>
-    <script>
-      async function getData() {
-        let res = await fetch("/get")
-          .then((res) => res.json())
-          .then((data) => data);
-        if (res.code === 0) {
-          if (
-            await dcodeIO.bcrypt.compare(JSON.stringify(res.html), res.hash)
-          ) {
-            document.body.innerHTML = res.html.body;
-            document.head.innerHTML = res.html.head;
-          }
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lrm;</title>
+  <script defer src="https://unpkg.com/bcryptjs@2.4.3/dist/bcrypt.js"></script>
+  <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+</head>
+
+<body>
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+  </style>
+  <script>
+    const peer = new Peer(undefined, {
+      host: window.location.hostname,
+      port: 3000,
+      path: '/peerserver'
+    });
+    async function getData() {
+      let res = await fetch("/get")
+        .then((res) => res.json())
+        .then((data) => data);
+      if (res.code === 1) {
+        if (
+          await dcodeIO.bcrypt.compare(JSON.stringify(res.html), res.hash)
+        ) {
+          document.body.innerHTML = res.html.body;
+          document.head.innerHTML = res.html.head;
         }
+      } else {
       }
-      getData();
-    </script>
-  </body>
+    }
+    getData();
+  </script>
+</body>
+
 </html>
