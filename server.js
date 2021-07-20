@@ -16,16 +16,6 @@ const app = express();
 app.set("view engine", "ejs");
 app.set("views", __dirname + "/views");
 
-//create express and peer server
-
-//todo: add .env with fallback to 3000
-let serverport = 3000;
-
-const server = app.listen(serverport, () =>
-  console.log(`Server running on ${serverport}`)
-);
-const peerServer = ExpressPeerServer(server);
-
 //html prototype and set global
 const html = {
   head: "<title>Loding done</title>",
@@ -44,6 +34,15 @@ const generateCheck = async (html) => {
 };
 generateCheck(html);
 
+//create express and peer server
+
+//todo: add .env with fallback to 3000
+let serverport = 3000;
+
+const server = app.listen(serverport, () =>
+  console.log(`Server running on ${serverport}`)
+);
+const peerServer = ExpressPeerServer(server);
 
 //create array of peers
 const peers = [];
