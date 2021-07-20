@@ -1,15 +1,48 @@
-const express = require('express')
-const { ExpressPeerServer } = require('peer');
-const app = express()
-const port = 3000
+//dependencies
+const express = require("express");
+const { ExpressPeerServer } = require("peer");
+const bcrypt = require("bcrypt");
 
-app.get('/', (req, res) => {
-  res.send('')
-})
+//include dotenv in development
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 
-const server = app.listen(3000 ,() => {
-  console.log(`Listening on port 3000`)})
+//load routers
+const router = require("./routes/Index");
 
+//setup express app for ejs
+const app = express();
+app.set("view engine", "ejs");
+app.set("views", __dirname + "/views");
+
+//create express and peer server
+
+let serverport = 3000;
+
+const server = app.listen(serverport, () =>
+  console.log(`Server running on ${serverport}`)
+);
 const peerServer = ExpressPeerServer(server);
 
-app.use('/peerserver', peerServer);
+//html prototype and set global
+const html = {
+  head: "<title>Loding done</title>",
+  body: "Hallo",
+};
+global.html = html
+
+//generate checkHash
+const generateCheck = async (html) => {
+  try {
+    global.checkHash = await bcrypt.hash(JSON.stringify(html), 10);
+  } catch (err) {
+    console.log(err)
+    process.exit(1)
+  }
+};
+generateCheck(html);
+
+//use routes
+app.use("/peerserver", peerServer);
+app.use("/", router);
