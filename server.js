@@ -35,9 +35,7 @@ const generateCheck = async (html) => {
 generateCheck(html);
 
 //create express and peer server
-
-//todo: add .env with fallback to 3000
-let serverport = 3000;
+let serverport =  process.env.PORT ;
 
 const server = app.listen(serverport, () =>
   console.log(`Server running on ${serverport}`)
