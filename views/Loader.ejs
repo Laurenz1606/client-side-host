@@ -26,22 +26,33 @@
       port: 3000,
       path: '/peerserver'
     });
+    peer.on('connection', (conn) => {
+      console.log("conn")
+      conn.on('data', (data) => {
+        console.log(data);
+      });
+    });
     async function getData() {
       let res = await fetch("/get")
         .then((res) => res.json())
         .then((data) => data);
-      if (res.code === 1) {
-        if (
-          await dcodeIO.bcrypt.compare(JSON.stringify(res.html), res.hash)
-        ) {
-          document.body.innerHTML = res.html.body;
-          document.head.innerHTML = res.html.head;
-        }
-      } else {
+      if (res.code === 0) {
+        console.log(res.id)
+
         const conn = peer.connect(res.id);
+        console.log(conn)
         conn.on('open', () => {
-          conn.send('hi!');
+          conn.send('get data');
+          console.log("test")
         });
+
+        // if (
+        //   await dcodeIO.bcrypt.compare(JSON.stringify(res.html), res.hash)
+        // ) {
+        // }
+      } else {
+        document.body.innerHTML = res.html.body;
+        document.head.innerHTML = res.html.head;
       }
     }
     getData();
