@@ -2,7 +2,6 @@
 const express = require("express");
 const { ExpressPeerServer } = require("peer");
 const bcrypt = require("bcrypt");
-const { setprop, getprop } = require("varkeeper");
 
 //include dotenv in development
 if (process.env.NODE_ENV !== "production") {
@@ -36,7 +35,7 @@ const generateCheck = async (html) => {
 generateCheck(html);
 
 //create express and peer server
-let serverport = process.env.PORT;
+let serverport = process.env.PORT ;
 
 const server = app.listen(serverport, () =>
   console.log(`Server running on ${serverport}`)
@@ -44,28 +43,24 @@ const server = app.listen(serverport, () =>
 const peerServer = ExpressPeerServer(server);
 
 //create array of peers
-setprop("peers", []);
+const peers = [];
 
 //add client to array on connection
 peerServer.on("connection", (client) => {
-  setprop("peers", [...getprop("peers"), { id: client.getId(), used: 0 }])
-  console.log(getprop("peers"))
+  peers.push({ id: client.getId(), used: 0 });
+  console.log(peers);
+  global.peers = peers;
 });
 
 //remove client form array on disconnect
 peerServer.on("disconnect", (client) => {
-  setprop(
-    "peers",
-    //remove client from array and return it
-    () => {
-      let x = getprop("peers");
-      x.splice(
-        x.findIndex((peer) => peer.id === client.getId()),
-        1
-      );
-      return x;
+  for (var i = 0; i < peers.length; i++) {
+    if (peers[i].id === client.getId()) {
+      peers.splice(i, 1);
     }
-  );
+  }
+  console.log(peers);
+  global.peers = peers;
 });
 
 //use routes

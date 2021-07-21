@@ -1675,11 +1675,6 @@ uuid@^3.4.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
 
-varkeeper@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/varkeeper/-/varkeeper-1.0.0.tgz#b81239e00162d4b4167d922bddf0195dad436821"
-  integrity sha512-GN0et8+kLEkoK1e33zLUj2HLtozVYcVm6Z7ohA3kcLf0oUFO2I6AD2aFZfFzAp17uJZTlEXPBJ9F7NyPZPRZ2Q==
-
 vary@^1, vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
