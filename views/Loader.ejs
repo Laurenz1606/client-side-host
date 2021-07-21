@@ -38,6 +38,10 @@
           document.head.innerHTML = res.html.head;
         }
       } else {
+        const conn = peer.connect(res.id);
+        conn.on('open', () => {
+          conn.send('hi!');
+        });
       }
     }
     getData();

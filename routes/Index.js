@@ -5,7 +5,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/get", (req, res) => {
-  res.json({ hash: global.checkHash, html: global.html, code: 0 });
+  res.json({ hash: global.checkHash, html: global.html, code: 1 });
 });
 
 module.exports = router;
