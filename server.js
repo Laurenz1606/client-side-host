@@ -35,7 +35,7 @@ const generateCheck = async (html) => {
 generateCheck(html);
 
 //create express and peer server
-let serverport =  process.env.PORT ;
+let serverport = process.env.PORT ;
 
 const server = app.listen(serverport, () =>
   console.log(`Server running on ${serverport}`)
