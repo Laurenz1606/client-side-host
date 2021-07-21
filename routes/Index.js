@@ -7,8 +7,15 @@ router.get("/", (req, res) => {
 
 router.get("/get", (req, res) => {
   let peers = getprop("peers");
+  // let peers = [];
   if (peers.length === 0) res.json({ html: global.html, code: 1 });
-  else res.json({ id: peers[0].id, code: 0 });
+  else {
+    peers.sort((a, b) => a.used - b.used);
+    peers[0].used = peers[0].used + 1;
+    console.log(peers)
+    setprop("peers", peers);
+    res.json({ id: peers[0].id, checksum: global.checkHash, code: 0 });
+  }
 });
 
 module.exports = router;

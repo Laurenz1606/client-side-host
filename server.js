@@ -20,7 +20,7 @@ app.set("views", __dirname + "/views");
 //html prototype and set global
 const html = {
   head: "<title>Loding done</title>",
-  body: "Hallo",
+  body: "Hallo<style>\*,\*::before,\*::after\{margin: 0;padding: 0;box-sizing: border-box;\}<\/style>",
 };
 global.html = html;
 

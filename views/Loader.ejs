@@ -7,51 +7,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>&lrm;</title>
   <script defer src="https://unpkg.com/bcryptjs@2.4.3/dist/bcrypt.js"></script>
-  <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.js"></script>
 </head>
 
 <body>
-  <style>
-    *,
-    *::before,
-    *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-  </style>
   <script>
-    const peer = new Peer(undefined, {
+    let html
+    let peer = new Peer(undefined, {
       host: window.location.hostname,
       port: 3000,
-      path: '/peerserver'
+      path: '/peerserver',
+      debug: 3
     });
     peer.on('connection', (conn) => {
-      console.log("conn")
+      console.log(peer.connections)
+
+      conn.on('error', () => {
+        conn.close()
+        console.log("conn closed")
+      })
       conn.on('data', (data) => {
-        console.log(data);
+        if (data === "get/data") { conn.send(html) }
       });
     });
+    peer.on('error', (err) => {
+    });
+
     async function getData() {
       let res = await fetch("/get")
         .then((res) => res.json())
         .then((data) => data);
+      html = res.html
+      checksum = res.checksum
       if (res.code === 0) {
-        console.log(res.id)
+        console.log("fetch from other client")
+        setTimeout(() => {
+          let conn
+          const connect = (id) => {
+            console.log("start conn")
+            try {
+              conn = peer.connect(id)
+              console.log("test")
+            } catch {
+              console.log("retry connection")
+              connect(id)
+            }
+          }
 
-        const conn = peer.connect(res.id);
-        console.log(conn)
-        conn.on('open', () => {
-          conn.send('get data');
-          console.log("test")
-        });
+          connect(res.id)
 
-        // if (
-        //   await dcodeIO.bcrypt.compare(JSON.stringify(res.html), res.hash)
-        // ) {
-        // }
+          conn.on('error', () => {
+            conn.close()
+            console.log("conn closed")
+          })
+
+          conn.on('open', async () => {
+            conn.send('get/data');
+          });
+          conn.on('data', async (data) => {
+
+            if (
+              await dcodeIO.bcrypt.compare(JSON.stringify(data), res.checksum)
+            ) {
+              document.body.innerHTML = document.body.innerHTML + data.body;
+              document.head.innerHTML = data.head;
+            } else {
+              console.log("wrong checksum or html")
+            }
+          });
+        }, 1000)
       } else {
-        document.body.innerHTML = res.html.body;
+        console.log("fetch from server")
+        document.body.innerHTML = document.body.innerHTML + res.html.body;
         document.head.innerHTML = res.html.head;
       }
     }
