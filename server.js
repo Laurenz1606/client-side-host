@@ -16,8 +16,25 @@ const app = express();
 app.set("view engine", "ejs");
 app.set("views", __dirname + "/views");
 
-//create express and peer server
+//html prototype and set global
+const html = {
+  head: "<title>Loding done</title>",
+  body: "Hallo",
+};
+global.html = html;
 
+//generate checkHash
+const generateCheck = async (html) => {
+  try {
+    global.checkHash = await bcrypt.hash(JSON.stringify(html), 10);
+  } catch (err) {
+    console.log(err);
+    process.exit(1);
+  }
+};
+generateCheck(html);
+
+//create express and peer server
 let serverport =  process.env.PORT ;
 
 const server = app.listen(serverport, () =>
@@ -25,23 +42,26 @@ const server = app.listen(serverport, () =>
 );
 const peerServer = ExpressPeerServer(server);
 
-//html prototype and set global
-const html = {
-  head: "<title>Loding done</title>",
-  body: "Hallo",
-};
-global.html = html
+//create array of peers
+const peers = [];
 
-//generate checkHash
-const generateCheck = async (html) => {
-  try {
-    global.checkHash = await bcrypt.hash(JSON.stringify(html), 10);
-  } catch (err) {
-    console.log(err)
-    process.exit(1)
+//add client to array on connection
+peerServer.on("connection", (client) => {
+  peers.push({ id: client.getId(), used: 0 });
+  console.log(peers);
+  global.peers = peers;
+});
+
+//remove client form array on disconnect
+peerServer.on("disconnect", (client) => {
+  for (var i = 0; i < peers.length; i++) {
+    if (peers[i].id === client.getId()) {
+      peers.splice(i, 1);
+    }
   }
-};
-generateCheck(html);
+  console.log(peers);
+  global.peers = peers;
+});
 
 //use routes
 app.use("/peerserver", peerServer);
