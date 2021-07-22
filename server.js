@@ -2,7 +2,7 @@
 const express = require("express");
 const { ExpressPeerServer } = require("peer");
 const bcrypt = require("bcrypt");
-const { setprop, getprop } = require("varkeeper");
+const { setprop, getprop, onchange } = require("varkeeper");
 
 //include dotenv in development
 if (process.env.NODE_ENV !== "production") {
@@ -19,8 +19,8 @@ app.set("views", __dirname + "/views");
 
 //html prototype and set global
 const html = {
-  head: "<title>Loding done</title>",
-  body: "Hallo<style>\*,\*::before,\*::after\{margin: 0;padding: 0;box-sizing: border-box;\}<\/style>",
+  head: "",
+  body: "",
 };
 global.html = html;
 
@@ -48,8 +48,7 @@ setprop("peers", []);
 
 //add client to array on connection
 peerServer.on("connection", (client) => {
-  setprop("peers", [...getprop("peers"), { id: client.getId(), used: 0 }])
-  console.log(getprop("peers"))
+  setprop("peers", [...getprop("peers"), { id: client.getId(), used: 0 }]);
 });
 
 //remove client form array on disconnect
@@ -67,6 +66,8 @@ peerServer.on("disconnect", (client) => {
     }
   );
 });
+
+onchange("peers", () => console.log(getprop("peers")))
 
 //use routes
 app.use("/peerserver", peerServer);

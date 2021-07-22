@@ -12,7 +12,6 @@ router.get("/get", (req, res) => {
   else {
     peers.sort((a, b) => a.used - b.used);
     peers[0].used = peers[0].used + 1;
-    console.log(peers)
     setprop("peers", peers);
     res.json({ id: peers[0].id, checksum: global.checkHash, code: 0 });
   }

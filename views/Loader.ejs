@@ -1,88 +1,71 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lrm;</title>
-  <script defer src="https://unpkg.com/bcryptjs@2.4.3/dist/bcrypt.js"></script>
-  <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.js"></script>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 </head>
 
 <body>
   <script>
-    let html
-    let peer = new Peer(undefined, {
-      host: window.location.hostname,
-      port: 3000,
-      path: '/peerserver',
-      debug: 3
-    });
-    peer.on('connection', (conn) => {
-      console.log(peer.connections)
+    let connections = 0
 
-      conn.on('error', () => {
-        conn.close()
-        console.log("conn closed")
-      })
-      conn.on('data', (data) => {
-        if (data === "get/data") { conn.send(html) }
-      });
-    });
-    peer.on('error', (err) => {
-    });
-
-    async function getData() {
+    async function setup() {
       let res = await fetch("/get")
         .then((res) => res.json())
         .then((data) => data);
-      html = res.html
-      checksum = res.checksum
       if (res.code === 0) {
-        console.log("fetch from other client")
-        setTimeout(() => {
-          let conn
-          const connect = (id) => {
-            console.log("start conn")
-            try {
-              conn = peer.connect(id)
-              console.log("test")
-            } catch {
-              console.log("retry connection")
-              connect(id)
-            }
-          }
-
-          connect(res.id)
-
-          conn.on('error', () => {
-            conn.close()
-            console.log("conn closed")
-          })
-
-          conn.on('open', async () => {
-            conn.send('get/data');
-          });
-          conn.on('data', async (data) => {
-
-            if (
-              await dcodeIO.bcrypt.compare(JSON.stringify(data), res.checksum)
-            ) {
-              document.body.innerHTML = document.body.innerHTML + data.body;
-              document.head.innerHTML = data.head;
-            } else {
-              console.log("wrong checksum or html")
-            }
-          });
-        }, 1000)
+        console.log("fetch from client")
+        createPeerWithConnection(res.id)
       } else {
         console.log("fetch from server")
-        document.body.innerHTML = document.body.innerHTML + res.html.body;
-        document.head.innerHTML = res.html.head;
+        setData(res.html)
+        createPeerWithoutConnection(res.html)
       }
     }
-    getData();
+    setup()
+
+    function createPeerWithoutConnection(html) {
+      let peer = new Peer(undefined, {
+        host: window.location.hostname,
+        port: 3000,
+        path: "/peerserver"
+      })
+      peer.on("open", () => {
+        peer.on('connection', function (conn) {
+          connections++
+          console.log(connections + ". From: " + conn.peer)
+          conn.on("open", () => {
+            conn.send(html)
+          })
+        });
+      })
+    }
+
+
+    function createPeerWithConnection(connid) {
+      let peer = new Peer(undefined, {
+        host: window.location.hostname,
+        port: 3000,
+        path: "/peerserver"
+      })
+      peer.on("open", () => {
+        let conn = peer.connect(connid);
+        conn.on('data', function (data) {
+          peer.destroy()
+          createPeerWithoutConnection(data)
+          setData(data)
+        })
+      })
+    }
+
+    function setData(html) {
+      document.body.innerHTML = html.body;
+      document.head.innerHTML = html.head;
+    }
   </script>
 </body>
 
