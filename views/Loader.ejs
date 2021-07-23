@@ -76,8 +76,36 @@
     }
 
     function setData(html) {
+      //set dom content
       document.head.innerHTML = html.head;
       document.body.innerHTML = html.body;
+
+      //rerun scripts
+      scriptsHandler("head")
+      scriptsHandler("body")
+    }
+
+    function scriptsHandler(prop) {
+      const scripts = document[prop].getElementsByTagName("script")
+      let newscripts = []
+      for (let i = 0; i < scripts.length; i++) {
+        let newscript = document.createElement('script');
+
+        //create same script again (rerun)
+        if (scripts[i].async) newscript.async = scripts[i].async
+        if (scripts[i].crossOrigin) newscript.crossOrigin = scripts[i].crossOrigin
+        if (scripts[i].defer) newscript.defer = scripts[i].defer
+        if (scripts[i].integrity) newscript.integrity = scripts[i].integrity
+        if (scripts[i].nomodule) newscript.nomodule = scripts[i].nomodule
+        if (scripts[i].referrerpolicy) newscript.referrerpolicy = scripts[i].referrerpolicy
+        if (scripts[i].src) newscript.src = scripts[i].src
+        if (scripts[i].type) newscript.type = scripts[i].type
+        if (scripts[i].innerHTML) newscript.innerHTML = scripts[i].innerHTML
+        newscripts = [...newscripts, newscript]
+      }
+      for (let i = 0; i < newscripts.length; i++) {
+        document[prop].appendChild(newscripts[i])
+      }
     }
   </script>
 </body>
