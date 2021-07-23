@@ -7,7 +7,6 @@ router.get("/", (req, res) => {
 
 router.get("/get", (req, res) => {
   let peers = getprop("peers");
-  // let peers = [];
   if (peers.length === 0) res.json({ html: global.html, code: 1 });
   else {
     peers.sort((a, b) => a.used - b.used);
@@ -15,6 +14,10 @@ router.get("/get", (req, res) => {
     setprop("peers", peers);
     res.json({ id: peers[0].id, checksum: global.checkHash, code: 0 });
   }
+});
+
+router.get("/html", (req, res) => {
+  res.json({ html: global.html});
 });
 
 module.exports = router;
